@@ -14,6 +14,21 @@ type GameState = 'start' | 'playing' | 'results';
 const STREAK_KEY = 'triviaBlitzStreak';
 const LAST_PLAYED_KEY = 'triviaBlitzLastPlayed';
 
+const TRIVIA_TOPICS = [
+  'World History',
+  'Science & Nature',
+  'Movies & TV Shows',
+  'Music',
+  'Sports',
+  'Geography',
+  'Literature',
+  'Art & Artists',
+  'Technology',
+  'Food & Drink',
+  'Mythology',
+  'Famous Inventions',
+];
+
 export default function Home() {
   const [gameState, setGameState] = useState<GameState>('start');
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -44,7 +59,8 @@ export default function Home() {
   const startGame = async () => {
     setIsLoading(true);
     try {
-      const { questions: newQuestions } = await generateDailyTrivia({ topic: 'General Knowledge' });
+      const randomTopic = TRIVIA_TOPICS[Math.floor(Math.random() * TRIVIA_TOPICS.length)];
+      const { questions: newQuestions } = await generateDailyTrivia({ topic: randomTopic });
       if (newQuestions && newQuestions.length > 0) {
         setQuestions(newQuestions);
         setGameState('playing');
