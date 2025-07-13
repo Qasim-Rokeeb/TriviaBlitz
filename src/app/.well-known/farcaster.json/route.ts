@@ -15,7 +15,7 @@ export async function GET() {
       iconUrl: `https://trivia-blitz.vercel.app//icon.png`,
       homeUrl: `https://trivia-blitz.vercel.app/frames`,
       imageUrl: `https://trivia-blitz.vercel.app/frames/hello/opengraph-image`,
-      buttonTitle: "Launch Frame",
+      buttonTitle: "Fun Trivia Game",
       splashImageUrl: `https://trivia-blitz.vercel.app/splash.png`,
       splashBackgroundColor: "#f7f7f7",
       webhookUrl: `https://trivia-blitz.vercel.app/api/webhook`,
