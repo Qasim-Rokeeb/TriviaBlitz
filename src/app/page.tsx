@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import sdk from "@farcaster/frame-sdk";
 import { generateDailyTrivia } from '@/ai/flows/generate-daily-trivia';
 import type { Question } from '@/lib/types';
 import StartScreen from '@/components/game/StartScreen';
@@ -30,6 +31,21 @@ const TRIVIA_TOPICS = [
 ];
 
 export default function Home() {
+
+
+
+ const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      sdk.actions.ready();
+    };
+    if (sdk && !isSDKLoaded) {
+      setIsSDKLoaded(true);
+      load();
+    }
+  }, [isSDKLoaded]);
+
   const [gameState, setGameState] = useState<GameState>('start');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [finalScore, setFinalScore] = useState(0);
