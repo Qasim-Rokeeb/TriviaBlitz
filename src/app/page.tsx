@@ -75,22 +75,25 @@ export default function Home() {
   const startGame = async (topic: string) => {
   setIsLoading(true);
   try {
+    console.log('Sending topic:', topic);
     const response = await fetch('/api/generate-trivia', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic }),
     });
 
+    console.log('Response status:', response.status);
     const data = await response.json();
+    console.log('Response JSON:', data);
 
-    if (data?.questions?.length > 0) {
+    if (response.ok && data?.questions?.length > 0) {
       setQuestions(data.questions);
       setGameState('playing');
     } else {
       throw new Error('No trivia questions returned.');
     }
   } catch (error) {
-    console.error('Failed to start game:', error);
+    console.error('Start game error:', error);
     toast({
       variant: 'destructive',
       title: 'Error',
@@ -100,6 +103,7 @@ export default function Home() {
     setIsLoading(false);
   }
 };
+
 
 
   const handleGameEnd = (score: number) => {
