@@ -46,7 +46,7 @@ const ResultsScreen = ({ score, onPlayAgain }: ResultsScreenProps) => {
 
       <Button onClick={onPlayAgain} size="lg" className="mt-4">
         <RotateCcw className="mr-2 h-5 w-5" />
-        New Challenge
+        Play Again
       </Button>
     </div>
   );

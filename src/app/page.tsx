@@ -56,11 +56,10 @@ export default function Home() {
     }
   }, []);
 
-  const startGame = async () => {
+  const startGame = async (topic: string) => {
     setIsLoading(true);
     try {
-      const randomTopic = TRIVIA_TOPICS[Math.floor(Math.random() * TRIVIA_TOPICS.length)];
-      const { questions: newQuestions } = await generateDailyTrivia({ topic: randomTopic });
+      const { questions: newQuestions } = await generateDailyTrivia({ topic });
       if (newQuestions && newQuestions.length > 0) {
         setQuestions(newQuestions);
         setGameState('playing');
@@ -112,7 +111,7 @@ export default function Home() {
     <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 md:p-8">
       <div className="w-full max-w-2xl">
         {gameState === 'start' && (
-          <StartScreen onStart={startGame} loading={isLoading} />
+          <StartScreen onStart={startGame} loading={isLoading} topics={TRIVIA_TOPICS} />
         )}
         {gameState === 'playing' && (
           <GameScreen questions={questions} onGameEnd={handleGameEnd} streak={streak} />
