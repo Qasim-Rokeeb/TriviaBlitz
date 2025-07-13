@@ -13,15 +13,14 @@ const POST_ANSWER_DELAY = 1500; // ms
 type GameScreenProps = {
   questions: Question[];
   onGameEnd: (finalScore: number) => void;
+  streak: number;
 };
 
-const GameScreen = ({ questions, onGameEnd }: GameScreenProps) => {
+const GameScreen = ({ questions, onGameEnd, streak }: GameScreenProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [isAnswered, setIsAnswered] = useState(false);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
-
-  const streak = 7; // Mocked streak data
 
   const handleSelectAnswer = (selectedIndex: number, timeLeft: number) => {
     if (isAnswered) return;
@@ -30,10 +29,12 @@ const GameScreen = ({ questions, onGameEnd }: GameScreenProps) => {
     setSelectedAnswerIndex(selectedIndex);
 
     const isCorrect = selectedIndex === questions[currentQuestionIndex].correctAnswerIndex;
+    let finalScore = score;
 
     if (isCorrect) {
       const newPoints = POINTS_PER_CORRECT + timeLeft * POINTS_PER_SECOND;
-      setScore((prevScore) => prevScore + newPoints);
+      finalScore += newPoints;
+      setScore(finalScore);
     }
     
     setTimeout(() => {
@@ -42,7 +43,7 @@ const GameScreen = ({ questions, onGameEnd }: GameScreenProps) => {
         setIsAnswered(false);
         setSelectedAnswerIndex(null);
       } else {
-        onGameEnd(score + (isCorrect ? POINTS_PER_CORRECT + timeLeft * POINTS_PER_SECOND : 0));
+        onGameEnd(finalScore);
       }
     }, POST_ANSWER_DELAY);
   };

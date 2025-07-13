@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Award, RotateCcw } from 'lucide-react';
-import Leaderboard from './Leaderboard';
 
 type ResultsScreenProps = {
   score: number;
@@ -26,9 +25,7 @@ const ResultsScreen = ({ score, onPlayAgain }: ResultsScreenProps) => {
         </CardContent>
       </Card>
 
-      <Leaderboard userScore={score} />
-
-      <Button onClick={onPlayAgain} size="lg">
+      <Button onClick={onPlayAgain} size="lg" className="mt-4">
         <RotateCcw className="mr-2 h-5 w-5" />
         New Challenge
       </Button>
