@@ -73,26 +73,34 @@ export default function Home() {
   }, []);
 
   const startGame = async (topic: string) => {
-    setIsLoading(true);
-    try {
-      const { questions: newQuestions } = await generateDailyTrivia({ topic });
-      if (newQuestions && newQuestions.length > 0) {
-        setQuestions(newQuestions);
-        setGameState('playing');
-      } else {
-        throw new Error('Could not generate trivia questions.');
-      }
-    } catch (error) {
-      console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to start the game. Please try again later.',
-      });
-    } finally {
-      setIsLoading(false);
+  setIsLoading(true);
+  try {
+    const response = await fetch('/api/generate-trivia', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic }),
+    });
+
+    const data = await response.json();
+
+    if (data?.questions?.length > 0) {
+      setQuestions(data.questions);
+      setGameState('playing');
+    } else {
+      throw new Error('No trivia questions returned.');
     }
-  };
+  } catch (error) {
+    console.error('Failed to start game:', error);
+    toast({
+      variant: 'destructive',
+      title: 'Error',
+      description: 'Failed to start the game. Please try again later.',
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleGameEnd = (score: number) => {
     const lastPlayed = localStorage.getItem(LAST_PLAYED_KEY);
