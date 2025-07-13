@@ -13,7 +13,7 @@ export async function GET() {
       version: "1",
       name: "TriviaBlitz",
       iconUrl: `https://trivia-blitz.vercel.app//icon.png`,
-      homeUrl: appUrl,
+      homeUrl: `https://trivia-blitz.vercel.app/frames`,
       imageUrl: `https://trivia-blitz.vercel.app/frames/hello/opengraph-image`,
       buttonTitle: "Launch Frame",
       splashImageUrl: `https://trivia-blitz.vercel.app/splash.png`,
