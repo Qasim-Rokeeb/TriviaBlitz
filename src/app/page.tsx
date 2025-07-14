@@ -31,10 +31,19 @@ const TRIVIA_TOPICS = [
 ];
 
 export default function Home() {
+  const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const [gameState, setGameState] = useState<GameState>('start');
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [finalScore, setFinalScore] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [streak, setStreak] = useState(0);
+  const { toast } = useToast();
 
-
-
- const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  // Handle client-side hydration
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -46,14 +55,10 @@ export default function Home() {
     }
   }, [isSDKLoaded]);
 
-  const [gameState, setGameState] = useState<GameState>('start');
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [finalScore, setFinalScore] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [streak, setStreak] = useState(0);
-  const { toast } = useToast();
-
   useEffect(() => {
+    // Only run on client side
+    if (!isClient) return;
+
     // Load streak from localStorage on initial load
     const savedStreak = localStorage.getItem(STREAK_KEY);
     const lastPlayed = localStorage.getItem(LAST_PLAYED_KEY);
@@ -70,43 +75,54 @@ export default function Home() {
     } else {
       setStreak(0);
     }
-  }, []);
+  }, [isClient]);
 
   const startGame = async (topic: string) => {
-  setIsLoading(true);
-  try {
-    console.log('Sending topic:', topic);
-    const response = await fetch('/api/generate-trivia', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic }),
-    });
+    setIsLoading(true);
+    try {
+      console.log('Starting game with topic:', topic);
+      
+      const response = await fetch('/api/generate-trivia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic }),
+      });
 
-    console.log('Response status:', response.status);
-    const data = await response.json();
-    console.log('Response JSON:', data);
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error text:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
 
-    if (response.ok && data?.questions?.length > 0) {
-      setQuestions(data.questions);
-      setGameState('playing');
-    } else {
-      throw new Error('No trivia questions returned.');
+      const data = await response.json();
+      console.log('Response JSON:', data);
+
+      if (data?.questions?.length > 0) {
+        setQuestions(data.questions);
+        setGameState('playing');
+      } else {
+        console.error('Invalid response data:', data);
+        throw new Error(data?.error || 'No trivia questions returned.');
+      }
+    } catch (error) {
+      console.error('Start game error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to start the game. Please try again later.',
+      });
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.error('Start game error:', error);
-    toast({
-      variant: 'destructive',
-      title: 'Error',
-      description: 'Failed to start the game. Please try again later.',
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+  };
 
   const handleGameEnd = (score: number) => {
+    // Only run on client side
+    if (!isClient) return;
+
     const lastPlayed = localStorage.getItem(LAST_PLAYED_KEY);
     let newStreak = 1; // Start with a streak of 1 for today's game
 
@@ -134,6 +150,17 @@ export default function Home() {
     setFinalScore(0);
     setGameState('start');
   };
+
+  // Don't render anything until client-side hydration is complete
+  if (!isClient) {
+    return (
+      <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 md:p-8">
+        <div className="w-full max-w-2xl">
+          <div className="text-center">Loading...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 sm:p-6 md:p-8">
